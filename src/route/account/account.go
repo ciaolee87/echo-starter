@@ -1,14 +1,11 @@
 package account
 
-import "github.com/labstack/echo"
+import (
+	"../../wrapper/context"
+)
 
-func Router(e *echo.Echo) {
-
-	e.GET("/user", func(c echo.Context) error {
-		u := new(User)
-		if err := c.Bind(u); err != nil {
-			return c.String(500, "parsing error")
-		}
-		return c.JSON(200, u)
+func Router(e context.BizEcho) {
+	e.BizGET("/user", func(c context.BizContext) error {
+		return c.BizSendJson(&context.BizJSON{Body: 123})
 	})
 }
