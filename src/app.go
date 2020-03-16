@@ -1,9 +1,9 @@
 package main
 
 import (
-	"./route/account"
-	"./utils/env"
-	"./wrapper/context"
+	"github.com/ciaolee87/echo-starter/src/route/account"
+	"github.com/ciaolee87/echo-starter/src/utils/env"
+	"github.com/ciaolee87/echo-starter/src/wrapper/context"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"os"
