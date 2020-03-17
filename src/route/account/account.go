@@ -1,11 +1,13 @@
 package account
 
 import (
-	"../../wrapper/context"
+	"github.com/ciaolee87/echo-starter/src/echo/wContext"
+	"github.com/ciaolee87/echo-starter/src/echo/wEcho"
+	"github.com/ciaolee87/echo-starter/src/echo/wJSON"
 )
 
-func Router(e context.BizEcho) {
-	e.BizGET("/user", func(c context.BizContext) error {
-		return c.BizSendJson(&context.BizJSON{Body: 123})
+func Router(e wEcho.BizEcho) {
+	e.BizGET("/user", func(c wContext.Context) error {
+		return c.BizJson(wJSON.DefaultJson("Hello world"))
 	})
 }

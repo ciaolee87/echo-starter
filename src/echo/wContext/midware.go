@@ -1,10 +1,10 @@
-package context
+package wContext
 
 import "github.com/labstack/echo"
 
 func ExtendContext(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		bizContext := BizContext{c}
+		bizContext := Context{c}
 		return next(bizContext)
 	}
 }
