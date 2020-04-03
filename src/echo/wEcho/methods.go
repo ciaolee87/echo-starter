@@ -8,3 +8,7 @@ import (
 func (e *BizEcho) BizGET(path string, handler func(c wContext.Context) error, mid ...echo.MiddlewareFunc) {
 	e.GET(path, wContext.CvtHandler(handler), mid...)
 }
+
+func (e *BizEcho) BizPOST(path string, handler func(c wContext.Context) error, mid ...echo.MiddlewareFunc) {
+	e.POST(path, wContext.CvtHandler(handler), mid...)
+}

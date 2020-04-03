@@ -7,3 +7,7 @@ import (
 type Routes interface {
 	Router(e *wEcho.BizEcho)
 }
+
+func UnknowRouter(e *wEcho.BizEcho) {
+
+}

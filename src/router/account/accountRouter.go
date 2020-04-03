@@ -6,7 +6,7 @@ import (
 	"github.com/ciaolee87/echo-starter/src/echo/wJSON"
 )
 
-func Router(e wEcho.BizEcho) {
+func Router(e *wEcho.BizEcho) {
 	e.BizGET("/user", func(c wContext.Context) error {
 		return c.BizJson(wJSON.DefaultJson("Hello world"))
 	})
