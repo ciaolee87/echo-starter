@@ -1,4 +1,4 @@
-package env
+package bizEnv
 
 import (
 	"github.com/joho/godotenv"
@@ -7,30 +7,39 @@ import (
 	"path/filepath"
 )
 
+func init() {
+	LoadEnv()
+}
+
 func LoadEnv() {
 	getPath := func() string {
 		envName := os.Getenv("GO_ENV")
+
+		log.Println("GO_ENV", envName)
 		if envName == "" {
-			return ".env"
+			return ".bizEnv"
 		} else {
-			return ".env." + envName
+			return ".bizEnv." + envName
 		}
 	}
 
 	execPath, err := os.Getwd()
 	if err != nil {
 		log.Fatal("! Env. Get exec path error!")
-		os.Exit(1)
 	}
 
-	path := filepath.Join(execPath, "env", getPath())
+	path := filepath.Join(execPath, "bizEnv", getPath())
+	log.Println("envPath", path)
 	errEnvLoad := godotenv.Load(path)
 	if errEnvLoad != nil {
 		log.Fatal("! Error Loading DotEnv")
-		os.Exit(1)
 	}
 
 	for _, pair := range os.Environ() {
 		log.Println(pair)
 	}
+}
+
+func Get(key string) string {
+	return os.Getenv(key)
 }
