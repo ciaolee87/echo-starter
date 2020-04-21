@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/ciaolee87/echo-starter/src/utils/bizLogger"
 	"github.com/labstack/echo"
-	"time"
 )
 
 type BizContext struct {
@@ -15,14 +14,6 @@ type BizContext struct {
 
 func NewBizContext(c *echo.Context) *BizContext {
 	context := BizContext{*c, *bizLogger.NewStackLogger()}
-
-	// 로거에 기본 데이터 입력
-	now := time.Now()
-	context.Logger.Log("time",  fmt.Sprintf("%2d-%02d-%02d", now.Year(), now.Month(), now.Day()))
-	context.Logger.Log("ip", context.RealIP())
-	context.Logger.Log("path",context.Path())
-	context.Logger.Log("",context.)
-
 	return &context
 }
 
@@ -38,4 +29,23 @@ func (c *BizContext) BizJson(body *BizJSON) error {
 	}
 
 	return c.Context.JSON(body.Code, body)
+}
+
+// 스트링 배열 합치기
+func parseStringArrayToString(body []string) string {
+	var str = ""
+	for _, s := range body {
+		str += s + ","
+	}
+	return str[len(str)-1:]
+}
+
+// 해더 파싱
+func parseHeaderToString(body map[string][]string) string {
+	var str = "{"
+	for s, strings := range body {
+		str += fmt.Sprintf("\"%s\" : \"%s\",", s, parseStringArrayToString(strings))
+	}
+	str = str[len(str)-1:] + "}"
+	return str
 }

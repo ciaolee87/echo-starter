@@ -1,12 +1,14 @@
 package bizLogger
 
 import (
+	"io"
 	"strings"
 	"time"
 )
 
 type StackLogger struct {
 	logs []LogData
+	io.Writer
 }
 
 func NewStackLogger() *StackLogger {
@@ -23,6 +25,12 @@ func (s *StackLogger) Log(title string, contents string) {
 	}
 
 	s.logs = append(s.logs, data)
+}
+
+func (s *StackLogger) Write(body []byte) (int, error) {
+	str := string(body)
+	s.Log("io.writer", string(body))
+	return len(str), nil
 }
 
 func (s *StackLogger) Flush() {
