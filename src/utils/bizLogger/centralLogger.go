@@ -1,20 +1,18 @@
 package bizLogger
 
-import "time"
+import (
+	"time"
+)
 
-var logger map[string]*CentralLogger
+var CLogger = make(map[string]*CentralLogger)
 
 type CentralLogger struct {
 	CreatedAt *time.Time
 	Logger    *StackLogger
 }
 
-func init() {
-	logger = make(map[string]*CentralLogger)
-}
-
 func Log(requestId string, title string, contents string) {
-	if stack, isExist := logger[requestId]; isExist {
+	if stack, isExist := CLogger[requestId]; isExist {
 		stack.Logger.Log(title, contents)
 	} else {
 		now := time.Now()
@@ -23,19 +21,22 @@ func Log(requestId string, title string, contents string) {
 			Logger:    NewStackLogger(),
 		}
 		newLogger.Logger.Log(title, contents)
-		logger[requestId] = &newLogger
+		CLogger[requestId] = &newLogger
 	}
 }
 
 func Flush(requestId string) {
-	if stack, isExist := logger[requestId]; isExist {
-		stack.Flush()
-		logger[requestId] = nil
+	if stack, isExist := CLogger[requestId]; isExist {
+		stack.Logger.Flush()
+		CLogger[requestId] = nil
 	}
 }
 
 func newCentralLogger() *CentralLogger {
+	now := time.Now()
 	cl := CentralLogger{
-		CreatedAt: *time.Now(),
+		CreatedAt: &now,
+		Logger:    NewStackLogger(),
 	}
+	return &cl
 }

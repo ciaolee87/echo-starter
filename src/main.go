@@ -17,6 +17,9 @@ func main() {
 	// 각각의 요청에 identifier 입력
 	Server.Echo.Use(middleware.RequestID())
 
+	// 로거
+	Server.Echo.Use(bizEcho.NewLoggerMiddleware())
+
 	// 중앙 에러 헨들러 작성
 	Server.Echo.Use(middleware.RecoverWithConfig(middleware.RecoverConfig{}))
 	Server.Echo.HTTPErrorHandler = bizEcho.ErrorHandler
