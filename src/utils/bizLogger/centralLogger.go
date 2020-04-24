@@ -31,12 +31,3 @@ func Flush(requestId string) {
 		CLogger[requestId] = nil
 	}
 }
-
-func newCentralLogger() *CentralLogger {
-	now := time.Now()
-	cl := CentralLogger{
-		CreatedAt: &now,
-		Logger:    NewStackLogger(),
-	}
-	return &cl
-}

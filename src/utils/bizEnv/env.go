@@ -17,9 +17,9 @@ func LoadEnv() {
 
 		log.Println("GO_ENV", envName)
 		if envName == "" {
-			return ".bizEnv"
+			return ".env"
 		} else {
-			return ".bizEnv." + envName
+			return ".evn." + envName
 		}
 	}
 
@@ -28,7 +28,7 @@ func LoadEnv() {
 		log.Fatal("! Env. Get exec path error!")
 	}
 
-	path := filepath.Join(execPath, "bizEnv", getPath())
+	path := filepath.Join(execPath, "env", getPath())
 	log.Println("envPath", path)
 	errEnvLoad := godotenv.Load(path)
 	if errEnvLoad != nil {
