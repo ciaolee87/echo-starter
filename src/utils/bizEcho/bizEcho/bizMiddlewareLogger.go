@@ -25,7 +25,7 @@ type centralLogOut struct {
 func (c *centralLogOut) Write(p []byte) (n int, err error) {
 	log := string(p)
 	splitIndex := strings.Index(log, "|")
-	bizLogger.Log(log[splitIndex:], "echoLog", log[:splitIndex+1])
+	bizLogger.Log(log[:splitIndex], "echoLog", log[:splitIndex+1])
 	return len(log), nil
 }
 

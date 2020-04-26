@@ -15,6 +15,9 @@ func Log(requestId string, title string, contents string) {
 	if stack, isExist := CLogger[requestId]; isExist {
 		stack.Logger.Log(title, contents)
 	} else {
+		if requestId == "" {
+			panic("RequestId not Found")
+		}
 		now := time.Now()
 		newLogger := CentralLogger{
 			CreatedAt: &now,

@@ -14,3 +14,13 @@ func NewJSON() *BizJSON {
 	}
 	return &json
 }
+
+func NewErrorJSON() *BizJSON {
+	json := BizJSON{
+		Code: 500,
+		Msg:  "Server Error",
+		Body: nil,
+	}
+
+	return &json
+}
