@@ -7,19 +7,19 @@ import (
 )
 
 type BizEcho struct {
-	Echo *echo.Echo
+	*echo.Echo
 }
 
 func NewEcho() *BizEcho {
-	server := BizEcho{Echo: echo.New()}
+	server := BizEcho{echo.New()}
 	return &server
 }
 
-func (e *BizEcho) BizGet(path string, h BizHandleFunc, m ...echo.MiddlewareFunc) *echo.Route {
+func (e *BizEcho) BizGET(path string, h BizHandleFunc, m ...echo.MiddlewareFunc) *echo.Route {
 	return e.Echo.Add(http.MethodGet, path, getDefaultHandler(h), m...)
 }
 
-func (e *BizEcho) BizPost(path string, h BizHandleFunc, m ...echo.MiddlewareFunc) *echo.Route {
+func (e *BizEcho) BizPOST(path string, h BizHandleFunc, m ...echo.MiddlewareFunc) *echo.Route {
 	return e.Echo.Add(http.MethodPost, path, getDefaultHandler(h), m...)
 }
 
@@ -28,7 +28,7 @@ func (e *BizEcho) BizGroup(prefix string, m ...echo.MiddlewareFunc) *BizGroup {
 	return &group
 }
 
-func getDefaultHandler(h BizHandleFunc) func(ctx echo.Context) error {
+func getDefaultHandler(h BizHandleFunc) echo.HandlerFunc {
 	return func(context echo.Context) error {
 		bizContext := NewBizContext(&context)
 		// 기초 에러 처리
@@ -37,9 +37,6 @@ func getDefaultHandler(h BizHandleFunc) func(ctx echo.Context) error {
 		}()
 		var err error = nil
 		err = h(bizContext)
-
-		// 로그서버에 로그 전송
-		bizContext.BizLogFlush()
 		return err
 	}
 }

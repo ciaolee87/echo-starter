@@ -8,11 +8,11 @@ import (
 
 // echo.Context 확장
 type BizContext struct {
-	ctx *echo.Context
+	echo.Context
 }
 
 func NewBizContext(c *echo.Context) *BizContext {
-	context := BizContext{c}
+	context := BizContext{*c}
 	return &context
 }
 
@@ -21,26 +21,27 @@ func (c *BizContext) BizJson(body *BizJSON) error {
 	if body == nil {
 		body = NewJSON()
 	}
-	return (*c.ctx).JSON(body.Code, body)
+	return c.JSON(body.Code, body)
 }
 
 // 로거 등록
 func (c *BizContext) BizLog(title string, args ...string) {
 	requestId := c.BizRequestID()
-	bizLogger.Log(requestId, title, strings.Join(args, " "))
+	bizLogger.Log(requestId, title, strings.Join(args, ", "))
 }
 
 // 로그 푸시
 func (c *BizContext) BizLogFlush() {
-	bizLogger.Flush(c.BizRequestID())
+	requestId := c.BizRequestID()
+	bizLogger.Flush(requestId)
 }
 
 // requestId 가저오는 메소드
 func (c *BizContext) BizRequestID() string {
-	return (*c.ctx).Request().Header.Get(echo.HeaderXRequestID)
+	return c.Response().Header().Get(echo.HeaderXRequestID)
 }
 
 // 즉시 출력되는 로거
 func (c *BizContext) BizLineLogger(title string, args ...string) {
-	bizLogger.LineLogger(title, strings.Join(args, " "))
+	bizLogger.LineLogger(title, strings.Join(args, ", "))
 }
