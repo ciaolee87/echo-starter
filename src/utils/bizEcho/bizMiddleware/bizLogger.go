@@ -1,4 +1,4 @@
-package bizEcho
+package bizMiddleware
 
 import (
 	"github.com/ciaolee87/echo-starter/src/utils/bizLogger"
@@ -23,10 +23,16 @@ type centralLogOut struct {
 }
 
 func (c *centralLogOut) Write(p []byte) (n int, err error) {
-	log := string(p)
-	splitIndex := strings.Index(log, "|")
-	bizLogger.Log(log[:splitIndex], "echoLog", log[:splitIndex+1])
-	return len(log), nil
+	logStr := string(p)
+	splitIndex := strings.Index(logStr, "|")
+
+	id := logStr[:splitIndex]
+	logToSave := logStr[splitIndex+1:]
+
+	// 로그를 추가하고 로그 서버로 출력한다.
+	bizLogger.Log(id, "echoLog", logToSave)
+	bizLogger.Flush(id)
+	return len(logToSave), nil
 }
 
 func newCentralLogOut() *centralLogOut {

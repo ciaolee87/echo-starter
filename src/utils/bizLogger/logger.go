@@ -36,7 +36,7 @@ func LineLogger(title string, content string) {
 // 시간:타이틀:컨텐츠 |  시간:타이틀:컨텐츠 | 시간:타이틀:컨텐츠 |  ... 형태
 func makeMsgToJson(data *[]LogData) (msg string) {
 
-	msg = fmt.Sprintf("{\"time\":\"%d\",", time.Now().Unix())
+	msg = fmt.Sprintf("{\"time\":\"%d\",", time.Now().Format())
 
 	for i, logData := range *data {
 

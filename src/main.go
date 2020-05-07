@@ -2,37 +2,46 @@ package main
 
 import (
 	"fmt"
-	bizEcho2 "github.com/ciaolee87/echo-starter/src/utils/bizEcho/bizEcho"
+	"github.com/ciaolee87/echo-starter/src/utils/bizEcho/bizEcho"
+	"github.com/ciaolee87/echo-starter/src/utils/bizEcho/bizMiddleware"
 	"github.com/ciaolee87/echo-starter/src/utils/bizEnv"
+	"github.com/hashicorp/go-uuid"
 	"github.com/labstack/echo/middleware"
 )
 
-var Server *bizEcho2.BizEcho
+var Server *bizEcho.BizEcho
 
 func init() {
 
 }
 
 func main() {
-	Server = bizEcho2.NewEcho()
+	Server = bizEcho.NewEcho()
 
-	// 각각의 요청에 identifier 입력
-	Server.Echo.Use(middleware.RequestID())
+	// 모든 요청에 고유 ID 값 등록
+	Server.Pre(
+		middleware.RequestIDWithConfig(middleware.RequestIDConfig{
+			Generator: func() string {
+				id, _ := uuid.GenerateUUID()
+				return id
+			},
+		}),
+		bizMiddleware.NewLoggerMiddleware(),
+	)
 
-	// 로거
-	Server.Echo.Use(bizEcho2.NewLoggerMiddleware())
+	api := Server.BizGroup("/api")
+	api.BizGET("/greeting", func(ctx *bizEcho.BizContext) error {
 
-	// 중앙 에러 헨들러 작성
-	Server.Echo.Use(middleware.RecoverWithConfig(middleware.RecoverConfig{}))
+		ctx.BizLog("안녕하세요", "로거 작동 잘해요!!")
 
-	Server.BizGet("/cool", func(ctx *bizEcho2.BizContext) error {
-		return ctx.BizJson(bizEcho2.NewErrorJSON())
+		return ctx.BizJson(bizEcho.NewJSON())
 	})
 
-	helloGroup := Server.BizGroup("/hello")
-	helloGroup.BizGET("/greeting", func(ctx *bizEcho2.BizContext) error {
-		return ctx.BizJson(bizEcho2.NewJSON())
-	})
+	// Page Not Found
+	api.BizGET("/*", bizEcho.PageNotFoundHandler)
 
-	Server.Echo.Start(fmt.Sprintf(":%s", bizEnv.Get("PORT")))
+	// Page Not Found
+	Server.BizGET("/*", bizEcho.PageNotFoundHandler)
+
+	Server.Start(fmt.Sprintf(":%s", bizEnv.Get("PORT")))
 }

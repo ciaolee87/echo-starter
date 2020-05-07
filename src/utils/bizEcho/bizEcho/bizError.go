@@ -1,6 +1,8 @@
 package bizEcho
 
-import "errors"
+import (
+	"errors"
+)
 
 type BizError struct {
 	Error    error

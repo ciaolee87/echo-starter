@@ -16,7 +16,7 @@ func Log(requestId string, title string, contents string) {
 		stack.Logger.Log(title, contents)
 	} else {
 		if requestId == "" {
-			panic("RequestId not Found")
+			return
 		}
 		now := time.Now()
 		newLogger := CentralLogger{
