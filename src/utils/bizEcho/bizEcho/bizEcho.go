@@ -31,30 +31,34 @@ func (e *BizEcho) BizGroup(prefix string, m ...echo.MiddlewareFunc) *BizGroup {
 func getDefaultHandler(h BizHandleFunc) echo.HandlerFunc {
 	return func(context echo.Context) error {
 		bizContext := NewBizContext(&context)
+
 		// 기초 에러 처리
 		defer func() {
-			recoverDefault(bizContext)
+			e := recover()
+			if e == nil {
+				return
+			}
+
+			// 사용자 정의 에러라면 콜백 실행
+			if bizError, isBizError := e.(BizError); isBizError {
+				// 로그생성
+				bizContext.BizLogStack(fmt.Sprintf("Panic : %s", bizError.Body.Msg))
+				bizContext.BizLogFlush(fmt.Sprintf("Exception : Log End"))
+
+				// 에러 콜백 실행
+				bizError.Callback(bizContext)
+				bizContext.BizJson(bizError.Body)
+			} else {
+				// 로그 생성
+				bizContext.BizLogStack(fmt.Sprintf("Panic : %s", e))
+				bizContext.BizLogFlush(fmt.Sprintf("Exception : Log End"))
+				bizContext.BizJson(NewErrorJSON())
+			}
 		}()
+
+		// 핸들러 실행
 		var err error = nil
 		err = h(bizContext)
 		return err
-	}
-}
-
-func recoverDefault(ctx *BizContext) {
-	if e := recover(); e != nil {
-		// 사용자 정의 에러라면 콜백 실행
-		if bizError, isBizError := e.(BizError); isBizError {
-			// 에러 콜백 실행
-			bizError.Callback(ctx)
-			ctx.BizLog("Panic", fmt.Sprintf("%s", e))
-			ctx.BizLog("bizJSON", fmt.Sprintf("%s", bizError.Body))
-			ctx.BizJson(bizError.Body)
-			return
-		}
-
-		//
-		ctx.BizLog("Panic", fmt.Sprintf("%s", e))
-		ctx.BizJson(NewErrorJSON())
 	}
 }

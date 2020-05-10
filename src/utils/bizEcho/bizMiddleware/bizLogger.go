@@ -1,41 +1,39 @@
 package bizMiddleware
 
 import (
-	"github.com/ciaolee87/echo-starter/src/utils/bizLogger"
+	"github.com/ciaolee87/echo-starter/src/utils/bizMq/bizMqLogger"
+	"github.com/hashicorp/go-uuid"
 	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
-	"io"
-	"strings"
 )
 
-func NewLoggerMiddleware() echo.MiddlewareFunc {
-	return middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Format: `${id}|{"time":"${time_rfc3339_nano}","id":"${id}","remote_ip":"${remote_ip}","host":"${host}",` +
-			`"method":"${method}","uri":"${uri}","status":${status},"error":"${error}","latency":${latency},` +
-			`"latency_human":"${latency_human}","bytes_in":${bytes_in},` +
-			`"bytes_out":${bytes_out}}`,
-		Output: newCentralLogOut(),
-	})
+type RequestInfo struct {
+	Url    string `json:"url"`
+	LogId  string `json:"logId"`
+	Method string `json:"method"`
+	Ip     string `json:"ip"`
 }
 
-type centralLogOut struct {
-	io.Writer
-}
+// 요청자 정보를 로깅
+// order
+// "00" : STACK LogID 기준으로 메모리에 저장
+// "01" : FLUSH 파일로 바로 저장되는 로그
+func LogRequestInformation(order string) echo.MiddlewareFunc {
+	return func(handlerFunc echo.HandlerFunc) echo.HandlerFunc {
+		return func(context echo.Context) error {
+			reqInfo := RequestInfo{
+				Url:    context.Request().Host,
+				LogId:  context.Request().Header.Get("LogId"),
+				Method: context.Request().Method,
+				Ip:     context.RealIP(),
+			}
 
-func (c *centralLogOut) Write(p []byte) (n int, err error) {
-	logStr := string(p)
-	splitIndex := strings.Index(logStr, "|")
+			if reqInfo.LogId == "" {
+				uid, _ := uuid.GenerateUUID()
+				reqInfo.LogId = uid
+			}
 
-	id := logStr[:splitIndex]
-	logToSave := logStr[splitIndex+1:]
-
-	// 로그를 추가하고 로그 서버로 출력한다.
-	bizLogger.Log(id, "echoLog", logToSave)
-	bizLogger.Flush(id)
-	return len(logToSave), nil
-}
-
-func newCentralLogOut() *centralLogOut {
-	logOut := centralLogOut{}
-	return &logOut
+			bizMqLogger.SendLog(reqInfo.LogId, order, reqInfo)
+			return handlerFunc(context)
+		}
+	}
 }

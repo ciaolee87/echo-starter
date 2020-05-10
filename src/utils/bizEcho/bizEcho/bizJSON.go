@@ -3,7 +3,7 @@ package bizEcho
 type BizJSON struct {
 	Code int          `json:"code"`
 	Msg  string       `json:"msg"`
-	Body *interface{} `json:"body"`
+	Body *interface{} `json:"body,omitempty"`
 }
 
 func NewJSON() *BizJSON {

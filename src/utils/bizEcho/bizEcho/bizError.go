@@ -11,7 +11,7 @@ type BizError struct {
 }
 
 var (
-	Error2000RequestIdNotFound = BizError{
+	Error2000 = BizError{
 		Error: errors.New("RequestId not found!!"),
 		Body: &BizJSON{
 			Code: 2000,

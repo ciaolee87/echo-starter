@@ -1,4 +1,4 @@
-package bizRabbitMq
+package bizMq
 
 import (
 	"github.com/streadway/amqp"

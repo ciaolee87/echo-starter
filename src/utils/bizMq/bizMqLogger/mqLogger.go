@@ -3,7 +3,7 @@ package bizMqLogger
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ciaolee87/echo-starter/src/utils/bizRabbitMq"
+	"github.com/ciaolee87/echo-starter/src/utils/bizMq"
 	"log"
 	"time"
 )
@@ -19,8 +19,8 @@ type LogDataUnit struct {
 }
 
 var (
-	conn        *bizRabbitMq.Connection
-	queue       *bizRabbitMq.Queue
+	conn        *bizMq.Connection
+	queue       *bizMq.Queue
 	svId        string
 	ORDER_STACK = "00"
 	ORDER_FLUSH = "01"
@@ -28,7 +28,7 @@ var (
 
 // 로거를 초기화 한다.
 func InitMqLogger(
-	connection *bizRabbitMq.Connection,
+	connection *bizMq.Connection,
 	queueName string,
 	serverId string,
 ) {
@@ -46,9 +46,9 @@ func SendLog(logId string, order string, value interface{}) {
 	}
 	byteString, err := json.Marshal(logData)
 	if err != nil {
-		log.Fatal("마샤링 실패")
+		log.Fatal("마샬링 실패")
 	}
 	madeLog := fmt.Sprintf("%s|%s|%s", logId, order, string(byteString))
-	log.Println(madeLog)
+	log.Println("Send Log : " + madeLog)
 	queue.BizPublish([]byte(madeLog))
 }

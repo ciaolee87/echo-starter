@@ -1,8 +1,8 @@
 package bizLogger
 
 import (
-	"github.com/ciaolee87/echo-starter/src/utils/bizRabbitMq"
-	"github.com/ciaolee87/echo-starter/src/utils/bizRabbitMq/bizMqLogger"
+	"github.com/ciaolee87/echo-starter/src/utils/bizMq"
+	"github.com/ciaolee87/echo-starter/src/utils/bizMq/bizMqLogger"
 	"github.com/hashicorp/go-uuid"
 )
 
@@ -12,7 +12,7 @@ type LogEx struct {
 }
 
 func ExampleSendLog() {
-	conn := bizRabbitMq.NewConnection("amqp://root:flowd1234@13.125.105.222:5500")
+	conn := bizMq.NewConnection("amqp://root:flowd1234@13.125.105.222:5500")
 
 	bizMqLogger.InitMqLogger(
 		conn,

@@ -1,18 +1,20 @@
 package bizEcho
 
 import (
-	"github.com/ciaolee87/echo-starter/src/utils/bizLogger"
 	"github.com/labstack/echo"
-	"strings"
 )
 
 // echo.Context 확장
 type BizContext struct {
 	echo.Context
+	BizLogger
 }
 
 func NewBizContext(c *echo.Context) *BizContext {
-	context := BizContext{*c}
+	logId := (*c).Request().Header.Get("LogId")
+	context := BizContext{*c, BizLogger{
+		LogId: logId,
+	}}
 	return &context
 }
 
@@ -21,27 +23,16 @@ func (c *BizContext) BizJson(body *BizJSON) error {
 	if body == nil {
 		body = NewJSON()
 	}
-	return c.JSON(body.Code, body)
-}
 
-// 로거 등록
-func (c *BizContext) BizLog(title string, args ...string) {
-	requestId := c.BizRequestID()
-	bizLogger.Log(requestId, title, strings.Join(args, ", "))
-}
+	if body.Code < 1000 {
+		return c.JSON(body.Code, body)
+	} else {
+		return c.JSON(200, body)
+	}
 
-// 로그 푸시
-func (c *BizContext) BizLogFlush() {
-	requestId := c.BizRequestID()
-	bizLogger.Flush(requestId)
 }
 
 // requestId 가저오는 메소드
 func (c *BizContext) BizRequestID() string {
 	return c.Response().Header().Get(echo.HeaderXRequestID)
-}
-
-// 즉시 출력되는 로거
-func (c *BizContext) BizLineLogger(title string, args ...string) {
-	bizLogger.LineLogger(title, strings.Join(args, ", "))
 }
